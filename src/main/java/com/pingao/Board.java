@@ -302,13 +302,15 @@ public class Board {
                 System.out.println("You both are so good, but game is draw!");
             }
             System.out.println("Summary:");
-            System.out.printf("%s   Step: %d   Total Time: %3ds   Avg Time: %.1fs\n", player1, player1.step(), player1.times(), player1.times() * 1.0 / player1.step());
-            System.out.printf("%s   Step: %d   Total Time: %3ds   Avg Time: %.1fs\n", player2, player2.step(), player2.times(), player2.times() * 1.0 / player2.step());
+            double timesOfP1 = player1.times() * 1.0 / 1E9;
+            double timesOfP2 = player2.times() * 1.0 / 1E9;
+            System.out.printf("%s   Step: %d   Total Time: %3.1fs   Avg Time: %.1fs\n", "*" + player1, player1.step(), timesOfP1, timesOfP1 / player1.step());
+            System.out.printf("%s   Step: %d   Total Time: %3.1fs   Avg Time: %.1fs\n", " " + player2, player2.step(), timesOfP2, timesOfP2 / player2.step());
         }
     }
 
     private String buildPlayerInfo(Player player) {
-        return player + "  Step: " + player.step() + "  Last Pos: " + player.getLastPos() + "   Last Time: " + player.getLastTime() + "s";
+        return player + "  Step: " + player.step() + "  Last Pos: " + player.getLastPos();
     }
 
     public enum Status {P1_WIN, P2_WIN, DRAW, ONGOING}

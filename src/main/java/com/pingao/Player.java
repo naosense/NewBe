@@ -4,7 +4,6 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by pingao on 2017/12/9.
@@ -47,7 +46,7 @@ public abstract class Player {
         Move move = decide(board);
         for (; !board.mark(move.getNext(), this); move = decide(board)) ;
         long end = System.nanoTime();
-        times.add(TimeUnit.NANOSECONDS.toSeconds(end - start));
+        times.add(end - start);
         path.add(move.getNext());
     }
 
