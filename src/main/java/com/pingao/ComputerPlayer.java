@@ -2,6 +2,7 @@ package com.pingao;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Created by pingao on 2017/12/9.
@@ -15,6 +16,7 @@ public class ComputerPlayer extends Player {
         super(marker);
         this.depth = depth;
         this.memory = new HashMap<>();
+        IntStream.rangeClosed(0, depth).forEach(i -> this.memory.put(i, new HashMap<>()));
     }
 
     private Move first() {
@@ -31,7 +33,6 @@ public class ComputerPlayer extends Player {
     }
 
     private Move alphaBeta(Board board, int depth, int alpha, int beta, Player player) {
-        memory.computeIfAbsent(depth, k -> new HashMap<>());
         if (board.status().isGameOver() || depth <= 0) {
             return new Move(board.evaluate(this, depth), null);
         }
