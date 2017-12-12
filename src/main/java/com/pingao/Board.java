@@ -16,17 +16,16 @@ public class Board {
     public static final int N_COL = 10;
     private static final char C = '·';
     private static final int AVAILABLE_DISTANCE = 2;
-    private static final List<Pos> ALL_POS = IntStream.range(0, N_ROW).boxed()
-        .flatMap(i -> IntStream.range(0, N_COL)
-            .mapToObj(j -> new Pos(i, j)))
-        .collect(Collectors.toList());
-
+    private static final Random RANDOM = new Random();
+    private static final List<Pos> ALL_POS = buildPos();
     private static final List<List<Pos>> BANDS = buildBands();
+    private static final long[][] HASH_TABLE = initHash();
+
     private final GameStatus status;
     private final char[][] grid;
     private final Player player1;
     private final Player player2;
-    private final Map<Player, Player> opponents;
+    private long hash;
 
     public Board(Player player1, Player player2) {
         this.grid = new char[][]{
@@ -43,18 +42,16 @@ public class Board {
         };
         this.player1 = player1;
         this.player2 = player2;
-        this.opponents = new HashMap<>();
-        opponents.put(player1, player2);
-        opponents.put(player2, player1);
         this.status = new GameStatus(Status.ONGOING, null, Collections.emptySet());
+        this.hash = RANDOM.nextLong();
     }
 
     public Board(Board other) {
         this.player1 = other.player1;
         this.player2 = other.player2;
-        this.opponents = other.opponents;
         this.grid = cloneArray(other.grid);
         this.status = new GameStatus(other.status.status, other.status.winner, other.status.winningSet);
+        this.hash = other.hash;
     }
 
     private static char[][] cloneArray(char[][] src) {
@@ -64,6 +61,26 @@ public class Board {
             System.arraycopy(src[i], 0, target[i], 0, src[i].length);
         }
         return target;
+    }
+
+    private static long[][] initHash() {
+        long[][] hash = new long[N_ROW * N_COL][2];
+        for (int i = 0; i < N_ROW * N_COL; i++) {
+            for (int j = 0; j < 2; j++) {
+                hash[i][j] = RANDOM.nextLong();
+            }
+        }
+        return hash;
+    }
+
+    private static List<Pos> buildPos() {
+        List<Pos> poses = new ArrayList<>();
+        for (int i = 0; i < N_ROW; i++) {
+            for (int j = 0; j < N_COL; j++) {
+                poses.add(new Pos(i, j));
+            }
+        }
+        return poses;
     }
 
     private static List<List<Pos>> buildBands() {
@@ -105,6 +122,7 @@ public class Board {
         }
         grid[pos.row][pos.col] = player.marker;
         check();
+        hash ^= HASH_TABLE[pos.index][player == player1 ? 0 : 1];
         return true;
     }
 
@@ -170,23 +188,27 @@ public class Board {
         return ALL_POS.stream().noneMatch(p -> board[p.row][p.col] == C);
     }
 
+    public long hash() {
+        return hash;
+    }
+
     public GameStatus status() {
         return status;
     }
 
     public Set<Pos> getAvailablePos() {
-        return ALL_POS.stream().filter(p -> isPosValid(grid, p)).collect(Collectors.toSet());
+        return ALL_POS.stream().filter(this::isPosValid).collect(Collectors.toSet());
     }
 
-    private boolean isPosValid(char[][] board, Pos pos) {
-        if (board[pos.row][pos.col] != C) {
+    private boolean isPosValid(Pos pos) {
+        if (grid[pos.row][pos.col] != C) {
             return false;
         }
         int rowL = pos.row - AVAILABLE_DISTANCE < 0 ? 0 : pos.row - AVAILABLE_DISTANCE;
         int colL = pos.col - AVAILABLE_DISTANCE < 0 ? 0 : pos.col - AVAILABLE_DISTANCE;
         int rowH = pos.row + AVAILABLE_DISTANCE > N_ROW - 1 ? N_ROW - 1 : pos.row + AVAILABLE_DISTANCE;
         int colH = pos.col + AVAILABLE_DISTANCE > N_COL - 1 ? N_COL - 1 : pos.col + AVAILABLE_DISTANCE;
-        return IntStream.range(rowL, rowH).boxed().flatMap(i -> IntStream.range(colL, colH).mapToObj(j -> board[i][j] != C)).anyMatch(b -> b);
+        return IntStream.range(rowL, rowH).boxed().flatMap(i -> IntStream.range(colL, colH).mapToObj(j -> grid[i][j] != C)).anyMatch(b -> b);
     }
 
     public int evaluate(Player player, int depth) {
@@ -197,13 +219,9 @@ public class Board {
         } else {
             Map<Player, Set<Set<Pos>>> groups = scan();
             Set<Set<Board.Pos>> groupsOfPlayer = groups.get(player);
-            Set<Set<Board.Pos>> groupsOfOpponent = groups.get(opponents.get(player));
+            Set<Set<Board.Pos>> groupsOfOpponent = groups.get(opponent(player));
             return groupsOfPlayer.stream().mapToInt(g -> score(g, false)).sum() - groupsOfOpponent.stream().mapToInt(g -> score(g, true)).sum();
         }
-    }
-
-    public Player opponent(Player player) {
-        return opponents.get(player);
     }
 
     private int score(Set<Pos> group, boolean isO) {
@@ -259,6 +277,10 @@ public class Board {
                 return (min.row > 0 && min.col < N_COL - 1 && grid[min.row - 1][min.col + 1] == C ? 1 : 0) + (max.row < N_ROW - 1 && max.col > 0 && grid[max.row + 1][max.col - 1] == C ? 1 : 0);
             }
         }
+    }
+
+    public Player opponent(Player player) {
+        return player == player1 ? player2 : player1;
     }
 
     public void start() {

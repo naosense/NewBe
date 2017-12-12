@@ -1,8 +1,6 @@
 package com.pingao;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -11,10 +9,12 @@ import java.util.stream.Collectors;
 public class ComputerPlayer extends Player {
     private static final Random RANDOM = new Random();
     private final int depth;
+    private final Map<Integer, Map<Long, Move>> memory;
 
     public ComputerPlayer(char marker, int depth) {
         super(marker);
         this.depth = depth;
+        this.memory = new HashMap<>();
     }
 
     private Move first() {
@@ -31,6 +31,7 @@ public class ComputerPlayer extends Player {
     }
 
     private Move alphaBeta(Board board, int depth, int alpha, int beta, Player player) {
+        memory.computeIfAbsent(depth, k -> new HashMap<>());
         if (board.status().isGameOver() || depth <= 0) {
             return new Move(board.evaluate(this, depth), null);
         }
@@ -41,7 +42,12 @@ public class ComputerPlayer extends Player {
             for (Board.Pos pos : sortPos) {
                 Board board1 = new Board(board);
                 board1.mark(pos, player);
-                Move w = alphaBeta(board1, depth - 1, alpha, beta, board1.opponent(player));
+                Map<Long, Move> m = memory.get(depth);
+                Move w = m.get(board1.hash());
+                if (w == null) {
+                    w = alphaBeta(board1, depth - 1, alpha, beta, board1.opponent(player));
+                    m.put(board1.hash(), w);
+                }
                 if (v.compareTo(w) < 0) {
                     v = new Move(w.getScore(), pos);
                 }
@@ -57,7 +63,12 @@ public class ComputerPlayer extends Player {
             for (Board.Pos pos : sortPos) {
                 Board board1 = new Board(board);
                 board1.mark(pos, player);
-                Move w = alphaBeta(board1, depth - 1, alpha, beta, board1.opponent(player));
+                Map<Long, Move> m = memory.get(depth);
+                Move w = m.get(board1.hash());
+                if (w == null) {
+                    w = alphaBeta(board1, depth - 1, alpha, beta, board1.opponent(player));
+                    m.put(board1.hash(), w);
+                }
                 if (v.compareTo(w) > 0) {
                     v = new Move(w.getScore(), pos);
                 }

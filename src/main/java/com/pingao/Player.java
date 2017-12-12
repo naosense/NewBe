@@ -70,11 +70,11 @@ public abstract class Player {
         @Override
         public int compareTo(Move o) {
             return Integer.compare(score, o.score);
-        }        @Override
+        }
+
+        @Override
         public String toString() {
             return score + ":-->" + next;
         }
-
-
     }
 }
