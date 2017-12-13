@@ -204,8 +204,8 @@ public class Board {
         }
         int rowL = pos.row - AVAILABLE_DISTANCE < 0 ? 0 : pos.row - AVAILABLE_DISTANCE;
         int colL = pos.col - AVAILABLE_DISTANCE < 0 ? 0 : pos.col - AVAILABLE_DISTANCE;
-        int rowH = pos.row + AVAILABLE_DISTANCE > N_ROW - 1 ? N_ROW - 1 : pos.row + AVAILABLE_DISTANCE;
-        int colH = pos.col + AVAILABLE_DISTANCE > N_COL - 1 ? N_COL - 1 : pos.col + AVAILABLE_DISTANCE;
+        int rowH = pos.row + AVAILABLE_DISTANCE > N_ROW ? N_ROW : pos.row + AVAILABLE_DISTANCE;
+        int colH = pos.col + AVAILABLE_DISTANCE > N_COL ? N_COL : pos.col + AVAILABLE_DISTANCE;
         return IntStream.range(rowL, rowH).boxed().flatMap(i -> IntStream.range(colL, colH).mapToObj(j -> grid[i][j] != EMPTY_CHAR)).anyMatch(b -> b);
     }
 

@@ -18,9 +18,9 @@ public class Main {
         }
 
         if (mode == 1) {
-            System.out.println("Please choose game level (1~4)");
+            System.out.println("Please choose game level (1~5)");
             int level;
-            for (level = CIN.nextInt(); level < 1 || level > 4; level = CIN.nextInt()) {
+            for (level = CIN.nextInt(); level < 1 || level > 5; level = CIN.nextInt()) {
                 System.out.println("Level must be between 1 and 5");
             }
 
@@ -46,15 +46,15 @@ public class Main {
 
             board.start();
         } else {
-            System.out.println("Please choose game level for Computer1 (1~4)");
+            System.out.println("Please choose game level for Computer1 (1~5)");
             int level1;
-            for (level1 = CIN.nextInt(); level1 < 1 || level1 > 4; level1 = CIN.nextInt()) {
+            for (level1 = CIN.nextInt(); level1 < 1 || level1 > 5; level1 = CIN.nextInt()) {
                 System.out.println("Level must be between 1 and 4");
             }
 
-            System.out.println("Please choose game level for Computer2 (1~4)");
+            System.out.println("Please choose game level for Computer2 (1~5)");
             int level2;
-            for (level2 = CIN.nextInt(); level2 < 1 || level2 > 4; level2 = CIN.nextInt()) {
+            for (level2 = CIN.nextInt(); level2 < 1 || level2 > 5; level2 = CIN.nextInt()) {
                 System.out.println("Level must be between 1 and 5");
             }
 
