@@ -209,9 +209,9 @@ public class Board {
         return IntStream.range(rowL, rowH).boxed().flatMap(i -> IntStream.range(colL, colH).mapToObj(j -> grid[i][j] != EMPTY_CHAR)).anyMatch(b -> b);
     }
 
-    public int evaluate(Player player, int depth) {
+    public int evaluate(Player player) {
         if (status.isWinning()) {
-            return (player == status.winner) ? (Integer.MAX_VALUE - 1 - depth) : (Integer.MIN_VALUE + 1 + depth);
+            return (player == status.winner) ? (Integer.MAX_VALUE - 1) : (Integer.MIN_VALUE + 1);
         } else if (status.isDraw()) {
             return 0;
         } else {
@@ -229,20 +229,20 @@ public class Board {
         } else if (group.size() == 2) {
             int open = getOpenCount(group);
             if (open == 2) {
-                res = 2;
+                res = 20;
             } else if (open == 1) {
-                res = 1;
+                res = 10;
             } else {
-                res = 1;
+                res = 5;
             }
         } else if (group.size() == 3) {
             int open = getOpenCount(group);
             if (open == 2) {
-                res = 2000;
+                res = isO ? 2000 : 1000;
             } else if (open == 1) {
-                res = isO ? 200 : 20;
+                res = isO ? 1000 : 500;
             } else {
-                res = isO ? 20 : 2;
+                res = isO ? 20 : 10;
             }
         } else if (group.size() == 4) {
             int open = getOpenCount(group);
@@ -251,7 +251,7 @@ public class Board {
             } else if (open == 1) {
                 res = isO ? 10000 : 5000;
             } else {
-                res = isO ? 2000 : 200;
+                res = isO ? 50 : 25;
             }
         } else if (group.size() == 5) {
             res = 1000000;

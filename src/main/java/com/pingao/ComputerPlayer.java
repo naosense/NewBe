@@ -34,7 +34,7 @@ public class ComputerPlayer extends Player {
 
     private Move alphaBeta(Board board, int depth, int alpha, int beta, Player player) {
         if (board.status().isGameOver() || depth <= 0) {
-            return new Move(board.evaluate(this, depth), null);
+            return new Move(board.evaluate(this), null);
         }
 
         if (this == player) {
@@ -88,7 +88,7 @@ public class ComputerPlayer extends Player {
             .map(p -> {
                 Board board1 = new Board(board);
                 board1.mark(p, player);
-                return new Move(board1.evaluate(this, 1), p);
+                return new Move(board1.evaluate(this), p);
             })
             .sorted(this == player ? Comparator.comparing(Move::getScore).reversed() : Comparator.comparing(Move::getScore))
             .map(Move::getNext)
