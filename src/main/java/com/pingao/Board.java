@@ -14,7 +14,7 @@ import java.util.stream.IntStream;
 public class Board {
     public static final int N_ROW = 10;
     public static final int N_COL = 10;
-    private static final char EMPTY_CHAR = '·';
+    private static final char EMPTY_CHAR = '-';
     private static final int AVAILABLE_DISTANCE = 2;
     private static final Random RANDOM = new Random();
     private static final List<Pos> ALL_POS = buildPos();
@@ -211,7 +211,7 @@ public class Board {
 
     public int evaluate(Player player, int depth) {
         if (status.isWinning()) {
-            return player == status.winner ? Integer.MAX_VALUE - depth : Integer.MIN_VALUE + depth;
+            return (player == status.winner) ? (Integer.MAX_VALUE - 1 - depth) : (Integer.MIN_VALUE + 1 + depth);
         } else if (status.isDraw()) {
             return 0;
         } else {
