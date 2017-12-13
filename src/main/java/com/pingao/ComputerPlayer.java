@@ -14,9 +14,12 @@ public class ComputerPlayer extends Player {
 
     public ComputerPlayer(char marker, int depth) {
         super(marker);
+        if (depth < 1) {
+            throw new IllegalArgumentException("Depth must be greater than 1");
+        }
         this.depth = depth;
         this.memory = new HashMap<>();
-        IntStream.rangeClosed(0, depth).forEach(i -> this.memory.put(i, new HashMap<>()));
+        IntStream.rangeClosed(1, depth).forEach(i -> this.memory.put(i, new HashMap<>()));
     }
 
     private Move first() {
@@ -28,12 +31,12 @@ public class ComputerPlayer extends Player {
         if (this.step() <= 0 && board.opponent(this).step() <= 0) {
             return first();
         } else {
-            return alphaBeta(board, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, this);
+            return alphaBeta(board, 1, Integer.MIN_VALUE, Integer.MAX_VALUE, this);
         }
     }
 
     private Move alphaBeta(Board board, int depth, int alpha, int beta, Player player) {
-        if (board.status().isGameOver() || depth <= 0) {
+        if (board.status().isGameOver() || this.depth <= depth) {
             return new Move(board.evaluate(this, depth), null);
         }
 
@@ -46,7 +49,7 @@ public class ComputerPlayer extends Player {
                 Map<Long, Move> m = memory.get(depth);
                 Move w = m.get(board1.hash());
                 if (w == null) {
-                    w = alphaBeta(board1, depth - 1, alpha, beta, board1.opponent(player));
+                    w = alphaBeta(board1, depth + 1, alpha, beta, board1.opponent(player));
                     m.put(board1.hash(), w);
                 }
                 if (v.compareTo(w) < 0) {
@@ -67,7 +70,7 @@ public class ComputerPlayer extends Player {
                 Map<Long, Move> m = memory.get(depth);
                 Move w = m.get(board1.hash());
                 if (w == null) {
-                    w = alphaBeta(board1, depth - 1, alpha, beta, board1.opponent(player));
+                    w = alphaBeta(board1, depth + 1, alpha, beta, board1.opponent(player));
                     m.put(board1.hash(), w);
                 }
                 if (v.compareTo(w) > 0) {

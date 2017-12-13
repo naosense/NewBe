@@ -7,19 +7,18 @@ import java.util.Scanner;
  */
 public class HumanPlayer extends Player {
     private static final String INTEGER_PATTERN = "\\d+";
+    private static final Scanner CIN = new Scanner(System.in);
 
     public HumanPlayer(char marker) {
         super(marker);
     }
 
-    private final Scanner cin = new Scanner(System.in);
-
     @Override
     protected Move decide(Board board) {
         System.out.println(this + " please input row and col");
-        String row = cin.next();
-        String col = cin.next();
-        for (; !row.matches(INTEGER_PATTERN) || !col.matches(INTEGER_PATTERN); row = cin.next(), col = cin.next()) {
+        String row = CIN.next();
+        String col = CIN.next();
+        for (; !row.matches(INTEGER_PATTERN) || !col.matches(INTEGER_PATTERN); row = CIN.next(), col = CIN.next()) {
             System.out.println("Row and col must be integer");
             System.out.println(this + " please input row and col");
         }

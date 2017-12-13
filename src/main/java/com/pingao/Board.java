@@ -14,7 +14,7 @@ import java.util.stream.IntStream;
 public class Board {
     public static final int N_ROW = 10;
     public static final int N_COL = 10;
-    private static final char C = '·';
+    private static final char EMPTY_CHAR = '·';
     private static final int AVAILABLE_DISTANCE = 2;
     private static final Random RANDOM = new Random();
     private static final List<Pos> ALL_POS = buildPos();
@@ -28,18 +28,7 @@ public class Board {
     private long hash;
 
     public Board(Player player1, Player player2) {
-        this.grid = new char[][]{
-            {C, C, C, C, C, C, C, C, C, C},
-            {C, C, C, C, C, C, C, C, C, C},
-            {C, C, C, C, C, C, C, C, C, C},
-            {C, C, C, C, C, C, C, C, C, C},
-            {C, C, C, C, C, C, C, C, C, C},
-            {C, C, C, C, C, C, C, C, C, C},
-            {C, C, C, C, C, C, C, C, C, C},
-            {C, C, C, C, C, C, C, C, C, C},
-            {C, C, C, C, C, C, C, C, C, C},
-            {C, C, C, C, C, C, C, C, C, C},
-        };
+        this.grid = initGrid();
         this.player1 = player1;
         this.player2 = player2;
         this.status = new GameStatus(Status.ONGOING, null, Collections.emptySet());
@@ -111,18 +100,28 @@ public class Board {
         }
     }
 
+    private char[][] initGrid() {
+        char[][] grid = new char[N_ROW][N_COL];
+        for (int i = 0; i < N_ROW; i++) {
+            for (int j = 0; j < N_COL; j++) {
+                grid[i][j] = EMPTY_CHAR;
+            }
+        }
+        return grid;
+    }
+
     public boolean mark(Pos pos, Player player) {
         if ((pos.row < 0 || pos.row > N_ROW - 1) || (pos.col < 0 || pos.col > N_COL - 1)) {
             System.out.println("Row must between 1 and " + N_ROW + ", Col must between 1 and " + N_COL);
             return false;
         }
-        if (grid[pos.row][pos.col] != C) {
+        if (grid[pos.row][pos.col] != EMPTY_CHAR) {
             System.out.println(pos + "=" + grid[pos.row][pos.col] + " is not empty");
             return false;
         }
         grid[pos.row][pos.col] = player.marker;
-        check();
         hash ^= HASH_TABLE[pos.index][player == player1 ? 0 : 1];
+        check();
         return true;
     }
 
@@ -134,7 +133,6 @@ public class Board {
             status.status = Status.P1_WIN;
             status.winner = player1;
             status.winningSet = groupsOfP1.stream().filter(g -> g.size() >= 5).findFirst().orElse(Collections.emptySet());
-            //return Status.P1_WIN;
         } else if (groupsOfP2.stream().anyMatch(g -> g.size() >= 5)) {
             status.status = Status.P2_WIN;
             status.winner = player2;
@@ -185,7 +183,7 @@ public class Board {
     }
 
     private boolean isDraw(char[][] board) {
-        return ALL_POS.stream().noneMatch(p -> board[p.row][p.col] == C);
+        return ALL_POS.stream().noneMatch(p -> board[p.row][p.col] == EMPTY_CHAR);
     }
 
     public long hash() {
@@ -201,19 +199,19 @@ public class Board {
     }
 
     private boolean isPosValid(Pos pos) {
-        if (grid[pos.row][pos.col] != C) {
+        if (grid[pos.row][pos.col] != EMPTY_CHAR) {
             return false;
         }
         int rowL = pos.row - AVAILABLE_DISTANCE < 0 ? 0 : pos.row - AVAILABLE_DISTANCE;
         int colL = pos.col - AVAILABLE_DISTANCE < 0 ? 0 : pos.col - AVAILABLE_DISTANCE;
         int rowH = pos.row + AVAILABLE_DISTANCE > N_ROW - 1 ? N_ROW - 1 : pos.row + AVAILABLE_DISTANCE;
         int colH = pos.col + AVAILABLE_DISTANCE > N_COL - 1 ? N_COL - 1 : pos.col + AVAILABLE_DISTANCE;
-        return IntStream.range(rowL, rowH).boxed().flatMap(i -> IntStream.range(colL, colH).mapToObj(j -> grid[i][j] != C)).anyMatch(b -> b);
+        return IntStream.range(rowL, rowH).boxed().flatMap(i -> IntStream.range(colL, colH).mapToObj(j -> grid[i][j] != EMPTY_CHAR)).anyMatch(b -> b);
     }
 
     public int evaluate(Player player, int depth) {
         if (status.isWinning()) {
-            return player == status.winner ? Integer.MAX_VALUE - depth - 1 : Integer.MIN_VALUE + depth + 1;
+            return player == status.winner ? Integer.MAX_VALUE - depth : Integer.MIN_VALUE + depth;
         } else if (status.isDraw()) {
             return 0;
         } else {
@@ -229,7 +227,7 @@ public class Board {
         if (group.size() == 1) {
             res = 1;
         } else if (group.size() == 2) {
-            int open = getOpenNumber(group);
+            int open = getOpenCount(group);
             if (open == 2) {
                 res = 2;
             } else if (open == 1) {
@@ -238,7 +236,7 @@ public class Board {
                 res = 1;
             }
         } else if (group.size() == 3) {
-            int open = getOpenNumber(group);
+            int open = getOpenCount(group);
             if (open == 2) {
                 res = 2000;
             } else if (open == 1) {
@@ -247,7 +245,7 @@ public class Board {
                 res = isO ? 20 : 2;
             }
         } else if (group.size() == 4) {
-            int open = getOpenNumber(group);
+            int open = getOpenCount(group);
             if (open == 2) {
                 res = isO ? 20000 : 10000;
             } else if (open == 1) {
@@ -261,20 +259,20 @@ public class Board {
         return res;
     }
 
-    private int getOpenNumber(Set<Pos> group) {
+    private int getOpenCount(Set<Pos> group) {
         List<Pos> poses = new ArrayList<>(group);
         poses.sort(Comparator.comparing(Pos::getIndex));
         Pos min = poses.get(0);
         Pos max = poses.get(poses.size() - 1);
         if (min.row == max.row) {
-            return (min.col > 0 && grid[min.row][min.col - 1] == C ? 1 : 0) + (max.col < N_COL - 1 && grid[min.row][max.col + 1] == C ? 1 : 0);
+            return (min.col > 0 && grid[min.row][min.col - 1] == EMPTY_CHAR ? 1 : 0) + (max.col < N_COL - 1 && grid[min.row][max.col + 1] == EMPTY_CHAR ? 1 : 0);
         } else if (min.col == max.col) {
-            return (min.row > 0 && grid[min.row - 1][min.col] == C ? 1 : 0) + (max.row < N_ROW - 1 && grid[max.row + 1][min.col] == C ? 1 : 0);
+            return (min.row > 0 && grid[min.row - 1][min.col] == EMPTY_CHAR ? 1 : 0) + (max.row < N_ROW - 1 && grid[max.row + 1][min.col] == EMPTY_CHAR ? 1 : 0);
         } else {
             if (min.col < max.col) {
-                return (min.row > 0 && min.col > 0 && grid[min.row - 1][min.col - 1] == C ? 1 : 0) + (max.row < N_ROW - 1 && max.col < N_COL - 1 && grid[max.row + 1][max.col + 1] == C ? 1 : 0);
+                return (min.row > 0 && min.col > 0 && grid[min.row - 1][min.col - 1] == EMPTY_CHAR ? 1 : 0) + (max.row < N_ROW - 1 && max.col < N_COL - 1 && grid[max.row + 1][max.col + 1] == EMPTY_CHAR ? 1 : 0);
             } else {
-                return (min.row > 0 && min.col < N_COL - 1 && grid[min.row - 1][min.col + 1] == C ? 1 : 0) + (max.row < N_ROW - 1 && max.col > 0 && grid[max.row + 1][max.col - 1] == C ? 1 : 0);
+                return (min.row > 0 && min.col < N_COL - 1 && grid[min.row - 1][min.col + 1] == EMPTY_CHAR ? 1 : 0) + (max.row < N_ROW - 1 && max.col > 0 && grid[max.row + 1][max.col - 1] == EMPTY_CHAR ? 1 : 0);
             }
         }
     }
