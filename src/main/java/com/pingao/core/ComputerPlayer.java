@@ -1,4 +1,4 @@
-package com.pingao;
+package com.pingao.core;
 
 import java.util.*;
 import java.util.stream.Collectors;

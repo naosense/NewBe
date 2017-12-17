@@ -1,10 +1,14 @@
-package com.pingao;
+package com.pingao.core;
 
+import com.pingao.ui.BackGroundPanel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.ToString;
 
+import javax.swing.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -31,8 +35,8 @@ public class Board {
 
     private final GameStatus status;
     private final char[][] grid;
-    private final Player player1;
-    private final Player player2;
+    public final Player player1;
+    public final Player player2;
     private long hash;
 
 
@@ -216,6 +220,15 @@ public class Board {
     }
 
 
+    private boolean isEmpty(int index) {
+        if (index < 0 || index >= N_ROW * N_COL) {
+            return false;
+        }
+        Pos pos = new Pos(index);
+        return this.grid[pos.row][pos.col] == EMPTY_CHAR;
+    }
+
+
     public long hash() {
         return this.hash;
     }
@@ -317,6 +330,84 @@ public class Board {
     }
 
 
+    public void start(BackGroundPanel back) {
+        while (!this.status.isGameOver()) {
+            if (this.player1.getLastPos() != null) {
+                back.mark(this.player1.getLastPos().getIndex(), 1, false);
+            }
+            if (this.player1 instanceof HumanMousePlayer) {
+                int index = back.getLastClicked();
+                while (index < 0 || !isEmpty(index)) {
+                    sleep(300);
+                    index = back.getLastClicked();
+                }
+                ((HumanMousePlayer) this.player1).click(new Pos(index));
+                back.mark(this.player1.next(this).getIndex(), 1, true);
+            } else {
+                back.mark(this.player1.next(this).getIndex(), 1, true);
+            }
+
+            if (this.status.isGameOver()) {
+                break;
+            }
+
+            if (this.player2.getLastPos() != null) {
+                back.mark(this.player2.getLastPos().getIndex(), 2, false);
+            }
+
+            if (this.player2 instanceof HumanMousePlayer) {
+                int index = back.getLastClicked();
+
+                while (index < 0 || !isEmpty(index)) {
+                    sleep(300);
+                    index = back.getLastClicked();
+                }
+                ((HumanMousePlayer) this.player2).click(new Pos(index));
+                back.mark(this.player2.next(this).getIndex(), 2, true);
+            } else {
+                back.mark(this.player2.next(this).getIndex(), 2, true);
+            }
+        }
+
+        // clear last pos of players
+        back.mark(this.player1.getLastPos().getIndex(), 1, false);
+        back.mark(this.player2.getLastPos().getIndex(), 2, false);
+        // mark winning set
+        String msg;
+        switch (this.status.status) {
+            case P1_WIN: {
+                this.status().winningSet.forEach(p -> back.mark(p.getIndex(), 1, true));
+                msg = "Black is win, congratulations!";
+                break;
+            }
+            case P2_WIN: {
+                this.status().winningSet.forEach(p -> back.mark(p.getIndex(), 2, true));
+                msg = "White is win, congratulations!";
+                break;
+            }
+
+            case DRAW: {
+                msg = "You both are so good, but game is draw";
+                break;
+            }
+            default: {
+                msg = "This won't happen";
+            }
+        }
+
+        JOptionPane.showMessageDialog(back, msg, "", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+
+    private void sleep(int milliseconds) {
+        try {
+            TimeUnit.MILLISECONDS.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public void print() {
         System.out.println();
         System.out.println();
@@ -386,6 +477,13 @@ public class Board {
         }
 
 
+        Pos(int index) {
+            this.index = index;
+            this.row = index / N_ROW;
+            this.col = index - this.row * N_ROW;
+        }
+
+
         @Override
         public String toString() {
             return "(" + (this.row + 1) + ", " + (this.col + 1) + ")";
@@ -395,6 +493,7 @@ public class Board {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class GameStatus {
         private Status status;
         private Player winner;

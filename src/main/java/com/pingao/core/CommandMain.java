@@ -1,4 +1,4 @@
-package com.pingao;
+package com.pingao.core;
 
 import java.util.Scanner;
 
@@ -6,7 +6,7 @@ import java.util.Scanner;
 /**
  * Created by pingao on 2017/12/9.
  */
-public class Main {
+public class CommandMain {
     private static final Scanner CIN = new Scanner(System.in);
 
 
@@ -41,7 +41,7 @@ public class Main {
             }
 
             Player computer = new ComputerPlayer('O', level);
-            Player human = new HumanPlayer('X');
+            Player human = new HumanCommandPlayer('X');
             Board board;
             if (first.equalsIgnoreCase("y")) {
                 board = new Board(human, computer);
