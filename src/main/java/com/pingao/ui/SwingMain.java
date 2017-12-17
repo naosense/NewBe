@@ -17,7 +17,7 @@ public class SwingMain extends JFrame {
 
 
     public static void main(String[] args) {
-        Object[] levels = Board.N_ROW > 10 ? new String[]{"1", "2", "3"} : new String[]{"1", "2", "3", "4", "5"};
+        Object[] levels = Board.N_ROW > 10 ? new String[]{"1", "2", "3", "4"} : new String[]{"1", "2", "3", "4", "5"};
         boolean again = true;
         while (again) {
             SwingMain main = new SwingMain();
