@@ -13,6 +13,7 @@ import java.awt.geom.Ellipse2D;
 public class MarkerPanel extends JPanel {
 
     private static final long serialVersionUID = 3198732980627375377L;
+    public static final int WIDTH = 50;
 
     private final BackGroundPanel background;
     private final int index;

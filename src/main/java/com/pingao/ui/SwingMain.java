@@ -17,14 +17,15 @@ public class SwingMain extends JFrame {
 
 
     public static void main(String[] args) {
+        Object[] levels = Board.N_ROW > 10 ? new String[]{"1", "2", "3"} : new String[]{"1", "2", "3", "4", "5"};
         boolean again = true;
         while (again) {
             SwingMain main = new SwingMain();
             main.setLayout(null);
             BackGroundPanel back = new BackGroundPanel();
-            back.setBounds(0, 0, 500, 500);
+            back.setBounds(0, 0, MarkerPanel.WIDTH * Board.N_COL, MarkerPanel.WIDTH * Board.N_ROW);
             main.add(back);
-            run(main, 500, 523);
+            run(main, MarkerPanel.WIDTH * Board.N_COL, MarkerPanel.WIDTH * Board.N_ROW + 23);
 
             Object mode =
                 JOptionPane.showInputDialog(main, "Please choose game mode", "", JOptionPane.INFORMATION_MESSAGE, null, new Object[]{
@@ -37,12 +38,10 @@ public class SwingMain extends JFrame {
 
             if ("Computer vs Human".equals(mode)) {
                 Object level =
-                    JOptionPane.showInputDialog(main, "Please choose game level", "", JOptionPane.INFORMATION_MESSAGE, null, new Object[]{
-                        "1", "2", "3", "4", "5"}, "3");
+                    JOptionPane.showInputDialog(main, "Please choose game level", "", JOptionPane.INFORMATION_MESSAGE, null, levels, "3");
                 while (level == null) {
                     level =
-                        JOptionPane.showInputDialog(main, "Please choose game level", "", JOptionPane.INFORMATION_MESSAGE, null, new Object[]{
-                            "1", "2", "3", "4", "5"}, "3");
+                        JOptionPane.showInputDialog(main, "Please choose game level", "", JOptionPane.INFORMATION_MESSAGE, null, levels, "3");
                 }
                 int first =
                     JOptionPane.showConfirmDialog(main, "Do you want to be first", "", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
@@ -63,21 +62,17 @@ public class SwingMain extends JFrame {
                 board.start(back);
             } else {
                 Object level1 =
-                    JOptionPane.showInputDialog(main, "Please choose level for computer1", "", JOptionPane.INFORMATION_MESSAGE, null, new Object[]{
-                        "1", "2", "3", "4", "5"}, "3");
+                    JOptionPane.showInputDialog(main, "Please choose level for computer1", "", JOptionPane.INFORMATION_MESSAGE, null, levels, "3");
                 while (level1 == null) {
                     level1 =
-                        JOptionPane.showInputDialog(main, "Please choose level for computer1", "", JOptionPane.INFORMATION_MESSAGE, null, new Object[]{
-                            "1", "2", "3", "4", "5"}, "3");
+                        JOptionPane.showInputDialog(main, "Please choose level for computer1", "", JOptionPane.INFORMATION_MESSAGE, null, levels, "3");
                 }
 
                 Object level2 =
-                    JOptionPane.showInputDialog(main, "Please choose level for computer2", "", JOptionPane.INFORMATION_MESSAGE, null, new Object[]{
-                        "1", "2", "3", "4", "5"}, "3");
+                    JOptionPane.showInputDialog(main, "Please choose level for computer2", "", JOptionPane.INFORMATION_MESSAGE, null, levels, "3");
                 while (level2 == null) {
                     level2 =
-                        JOptionPane.showInputDialog(main, "Please choose level for computer2", "", JOptionPane.INFORMATION_MESSAGE, null, new Object[]{
-                            "1", "2", "3", "4", "5"}, "3");
+                        JOptionPane.showInputDialog(main, "Please choose level for computer2", "", JOptionPane.INFORMATION_MESSAGE, null, levels, "3");
                 }
 
                 Player computer1 = new ComputerPlayer('O', Integer.parseInt(String.valueOf(level1)));
@@ -87,7 +82,7 @@ public class SwingMain extends JFrame {
             }
 
             again =
-                JOptionPane.showConfirmDialog(main, "Do you want play again", "", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == 0;
+                JOptionPane.showConfirmDialog(main, "Do you want to play again", "", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == 0;
             main.dispose();
         }
     }

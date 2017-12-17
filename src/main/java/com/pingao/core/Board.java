@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
  * Created by pingao on 2017/12/9.
  */
 public class Board {
-    public static final int N_ROW = 10;
-    public static final int N_COL = 10;
+    public static final int N_ROW = 15;
+    public static final int N_COL = 15;
     private static final char EMPTY_CHAR = '-';
     private static final int AVAILABLE_DISTANCE = 2;
     private static final Random RANDOM = new Random();

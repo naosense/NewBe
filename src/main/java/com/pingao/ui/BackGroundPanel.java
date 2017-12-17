@@ -1,5 +1,7 @@
 package com.pingao.ui;
 
+import com.pingao.core.Board;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -21,8 +23,8 @@ public class BackGroundPanel extends JPanel {
 
     public BackGroundPanel() {
         this.markers = new ArrayList<>();
-        setLayout(new GridLayout(10, 10));
-        for (int i = 0; i < 10 * 10; i++) {
+        setLayout(new GridLayout(Board.N_ROW, Board.N_COL));
+        for (int i = 0; i < Board.N_ROW * Board.N_COL; i++) {
             MarkerPanel marker = new MarkerPanel(this, i);
             add(marker);
             this.markers.add(marker);
@@ -62,11 +64,11 @@ public class BackGroundPanel extends JPanel {
         g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), null);
         Graphics2D g2 = (Graphics2D) g;
         g2.setStroke(new BasicStroke(1.5f));
-        for (int i = 0; i <= 10; i++) {//画横线
-            g.drawLine(0, 25 + i * 50, 500, 25 + i * 50);
+        for (int i = 0; i <= Board.N_ROW; i++) {//画横线
+            g.drawLine(0, MarkerPanel.WIDTH / 2 + i * MarkerPanel.WIDTH, MarkerPanel.WIDTH * Board.N_COL, MarkerPanel.WIDTH / 2 + i * MarkerPanel.WIDTH);
         }
-        for (int i = 0; i <= 10; i++) {//画竖线
-            g.drawLine(25 + i * 50, 0, 25 + i * 50, 500);
+        for (int i = 0; i <= Board.N_COL; i++) {//画竖线
+            g.drawLine(MarkerPanel.WIDTH / 2 + i * MarkerPanel.WIDTH, 0, MarkerPanel.WIDTH / 2 + i * MarkerPanel.WIDTH, MarkerPanel.WIDTH * Board.N_ROW);
         }
     }
 }
