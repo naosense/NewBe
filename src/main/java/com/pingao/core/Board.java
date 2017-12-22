@@ -39,7 +39,6 @@ public class Board {
     public final Player player2;
     private long hash;
 
-
     public Board(Player player1, Player player2) {
         this.grid = buildGrid();
         this.player1 = player1;
@@ -47,7 +46,6 @@ public class Board {
         this.status = new GameStatus(Status.ONGOING, null, Collections.emptySet());
         this.hash = buildHash();
     }
-
 
     public Board(Board other) {
         this.player1 = other.player1;
@@ -57,7 +55,6 @@ public class Board {
         this.hash = other.hash;
     }
 
-
     private static char[][] copyOf(char[][] src) {
         int length = src.length;
         char[][] target = new char[length][src[0].length];
@@ -66,7 +63,6 @@ public class Board {
         }
         return target;
     }
-
 
     private static long[][] buildRandomTable() {
         long[][] hash = new long[N_ROW * N_COL][3];
@@ -78,7 +74,6 @@ public class Board {
         return hash;
     }
 
-
     private static List<Pos> buildAllPos() {
         List<Pos> poses = new ArrayList<>();
         for (int i = 0; i < N_ROW; i++) {
@@ -88,7 +83,6 @@ public class Board {
         }
         return poses;
     }
-
 
     private static List<List<Pos>> buildBands() {
         Map<Integer, List<Pos>> basket = new HashMap<>();
@@ -109,7 +103,6 @@ public class Board {
         return basket.values().stream().filter(l -> l.size() > 1).collect(Collectors.toList());
     }
 
-
     private static void load(Map<Integer, List<Pos>> basket, int key, Pos pos) {
         List<Pos> band = basket.get(key);
         if (band == null) {
@@ -118,7 +111,6 @@ public class Board {
             band.add(pos);
         }
     }
-
 
     private char[][] buildGrid() {
         char[][] grid = new char[N_ROW][N_COL];
@@ -130,7 +122,6 @@ public class Board {
         return grid;
     }
 
-
     private long buildHash() {
         long hash = RANDOM.nextLong();
         for (int i = 0; i < N_ROW * N_COL; i++) {
@@ -138,7 +129,6 @@ public class Board {
         }
         return hash;
     }
-
 
     public boolean mark(Pos pos, Player player) {
         if ((pos.row < 0 || pos.row > N_ROW - 1) || (pos.col < 0 || pos.col > N_COL - 1)) {
@@ -155,7 +145,6 @@ public class Board {
         selfCheck();
         return true;
     }
-
 
     private void selfCheck() {
         Set<Set<Pos>> groupsOfP1 = GROUPS_CACHE.get(this.player1);
@@ -174,7 +163,6 @@ public class Board {
             this.status.status = Status.DRAW;
         }
     }
-
 
     private void scanGroups() {
         Set<Set<Pos>> groupsOfP1 = new HashSet<>();
@@ -214,11 +202,9 @@ public class Board {
         GROUPS_CACHE.put(this.player2, groupsOfP2);
     }
 
-
     private boolean isDraw() {
         return ALL_POS.stream().noneMatch(p -> this.grid[p.row][p.col] == EMPTY_CHAR);
     }
-
 
     private boolean isEmpty(int index) {
         if (index < 0 || index >= N_ROW * N_COL) {
@@ -228,21 +214,17 @@ public class Board {
         return this.grid[pos.row][pos.col] == EMPTY_CHAR;
     }
 
-
     public long hash() {
         return this.hash;
     }
-
 
     public GameStatus status() {
         return this.status;
     }
 
-
     public Set<Pos> getChildPos() {
         return ALL_POS.stream().filter(p -> this.grid[p.row][p.col] == EMPTY_CHAR && hasPlayerAdjacent(p)).collect(Collectors.toSet());
     }
-
 
     private boolean hasPlayerAdjacent(Pos pos) {
         int rowL = pos.row - AVAILABLE_DISTANCE < 0 ? 0 : pos.row - AVAILABLE_DISTANCE;
@@ -260,7 +242,6 @@ public class Board {
         return false;
     }
 
-
     public int evaluate(Player player) {
         if (this.status.isWinning()) {
             return (player == this.status.winner) ? (Integer.MAX_VALUE - 1) : (Integer.MIN_VALUE + 1);
@@ -273,7 +254,6 @@ public class Board {
         }
     }
 
-
     private int score(Set<Pos> group, boolean isEnemy) {
         int size = group.size();
         int open = countOfOpen(group);
@@ -281,11 +261,9 @@ public class Board {
         return ratio * SCORE_TABLE[size - 1][open];
     }
 
-
     public Player getEnemy(Player player) {
         return player == this.player1 ? this.player2 : this.player1;
     }
-
 
     private int countOfOpen(Set<Pos> group) {
         List<Pos> poses = new ArrayList<>(group);
@@ -309,7 +287,6 @@ public class Board {
         }
     }
 
-
     public void start() {
         print();
         while (!this.status.isGameOver()) {
@@ -328,7 +305,6 @@ public class Board {
             }
         }
     }
-
 
     public void start(BackGroundPanel back) {
         while (!this.status.isGameOver()) {
@@ -398,7 +374,6 @@ public class Board {
         JOptionPane.showMessageDialog(back, msg, "", JOptionPane.INFORMATION_MESSAGE);
     }
 
-
     private void sleep(int milliseconds) {
         try {
             TimeUnit.MILLISECONDS.sleep(milliseconds);
@@ -406,7 +381,6 @@ public class Board {
             e.printStackTrace();
         }
     }
-
 
     public void print() {
         System.out.println();
@@ -446,11 +420,9 @@ public class Board {
         }
     }
 
-
     private String buildPlayerInfo(Player player) {
         return player + "  Step: " + player.step() + "  Last Pos: " + player.getLastPos();
     }
-
 
     private void pause() {
         System.out.println("[Print any key to continue]");
@@ -458,7 +430,6 @@ public class Board {
         cin.useDelimiter("\n");
         cin.nextLine();
     }
-
 
     public enum Status {P1_WIN, P2_WIN, DRAW, ONGOING}
 
@@ -469,20 +440,17 @@ public class Board {
         private final int col;
         private final int index;
 
-
         Pos(int row, int col) {
             this.row = row;
             this.col = col;
             this.index = row * N_ROW + col;
         }
 
-
         Pos(int index) {
             this.index = index;
             this.row = index / N_ROW;
             this.col = index - this.row * N_ROW;
         }
-
 
         @Override
         public String toString() {
@@ -499,16 +467,13 @@ public class Board {
         private Player winner;
         private Set<Pos> winningSet;
 
-
         public boolean isGameOver() {
             return this.status != Status.ONGOING;
         }
 
-
         public boolean isDraw() {
             return this.status == Status.DRAW;
         }
-
 
         public boolean isWinning() {
             return this.status == Status.P1_WIN || this.status == Status.P2_WIN;

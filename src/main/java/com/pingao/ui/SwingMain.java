@@ -15,9 +15,8 @@ public class SwingMain extends JFrame {
 
     private static final long serialVersionUID = 8214339693742375000L;
 
-
     public static void main(String[] args) {
-        Object[] levels = Board.N_ROW > 10 ? new String[]{"1", "2", "3", "4"} : new String[]{"1", "2", "3", "4", "5"};
+        Object[] levels = new String[]{"1", "2", "3", "4", "5"};
         boolean again = true;
         while (again) {
             SwingMain main = new SwingMain();
@@ -86,7 +85,6 @@ public class SwingMain extends JFrame {
             main.dispose();
         }
     }
-
 
     private static void run(JFrame f, int width, int height) {
         SwingUtilities.invokeLater(() -> {

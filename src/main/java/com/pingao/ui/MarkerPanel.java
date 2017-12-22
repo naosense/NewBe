@@ -20,7 +20,6 @@ public class MarkerPanel extends JPanel {
     private boolean isLast;
     private int player;
 
-
     public MarkerPanel(BackGroundPanel background, int index) {
         this.background = background;
         this.index = index;
@@ -33,13 +32,11 @@ public class MarkerPanel extends JPanel {
         setOpaque(false);
     }
 
-
     public void mark(int player, boolean isLast) {
         this.player = player;
         this.isLast = isLast;
         repaint();
     }
-
 
     @Override
     protected void paintComponent(Graphics g) {

@@ -20,7 +20,6 @@ public class BackGroundPanel extends JPanel {
     private final List<MarkerPanel> markers;
     private int lastClicked = -1;
 
-
     public BackGroundPanel() {
         this.markers = new ArrayList<>();
         setLayout(new GridLayout(Board.N_ROW, Board.N_COL));
@@ -30,7 +29,6 @@ public class BackGroundPanel extends JPanel {
             this.markers.add(marker);
         }
     }
-
 
     private static Image readImg(InputStream in) {
         Image img = null;
@@ -42,21 +40,17 @@ public class BackGroundPanel extends JPanel {
         return img;
     }
 
-
     public void mark(int index, int player, boolean isLast) {
         this.markers.get(index).mark(player, isLast);
     }
-
 
     public int getLastClicked() {
         return this.lastClicked;
     }
 
-
     public void setClickedMarker(int index) {
         this.lastClicked = index;
     }
-
 
     @Override
     protected void paintComponent(Graphics g) {

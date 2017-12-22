@@ -6,17 +6,14 @@ package com.pingao.core;
 public class HumanMousePlayer extends Player {
     private Board.Pos next;
 
-
     public HumanMousePlayer(char marker) {
         super(marker);
     }
-
 
     @Override
     protected Move decide(Board board) {
         return new Move(0, this.next);
     }
-
 
     public void click(Board.Pos pos) {
         this.next = pos;

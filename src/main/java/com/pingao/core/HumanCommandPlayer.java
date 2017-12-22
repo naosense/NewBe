@@ -10,11 +10,9 @@ public class HumanCommandPlayer extends Player {
     private static final String INTEGER_PATTERN = "\\d+";
     private static final Scanner CIN = new Scanner(System.in);
 
-
     public HumanCommandPlayer(char marker) {
         super(marker);
     }
-
 
     @Override
     protected Move decide(Board board) {

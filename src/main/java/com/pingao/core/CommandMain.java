@@ -9,7 +9,6 @@ import java.util.Scanner;
 public class CommandMain {
     private static final Scanner CIN = new Scanner(System.in);
 
-
     public static void main(String[] args) {
 
         System.out.println("Hello, my name is NewBe, please choose game mode (1/2)");
