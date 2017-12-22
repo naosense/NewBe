@@ -1,8 +1,9 @@
 package com.pingao.core;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 
 /**
@@ -10,17 +11,25 @@ import java.util.stream.IntStream;
  */
 public class ComputerPlayer extends Player {
     private static final Random RANDOM = new Random();
-    private final Map<Integer, Map<Long, Move>> memory;
     private final int depth;
-
+    private final int[][] history;
+    private Move best;
 
     public ComputerPlayer(char marker, int depth) {
         super(marker);
         this.depth = depth;
-        this.memory = new HashMap<>();
-        IntStream.rangeClosed(0, depth).forEach(i -> this.memory.put(i, new HashMap<>()));
+        this.history = buildHistory();
     }
 
+    private int[][] buildHistory() {
+        int[][] history = new int[Board.N_ROW][Board.N_COL];
+        for (int i = 0; i < Board.N_ROW; i++) {
+            for (int j = 0; j < Board.N_COL; j++) {
+                history[i][j] = 0;
+            }
+        }
+        return history;
+    }
 
     private Move first() {
         return new Move(0, new Board.Pos(
@@ -29,78 +38,68 @@ public class ComputerPlayer extends Player {
         ));
     }
 
-
     @Override
     protected Move decide(Board board) {
         if (this.step() <= 0 && board.getEnemy(this).step() <= 0) {
             return first();
         } else {
-            return alphaBeta(board, this.depth, Integer.MIN_VALUE, Integer.MAX_VALUE, this);
+            alphaBeta(board, this.depth, Integer.MIN_VALUE, Integer.MAX_VALUE, this);
+            return this.best;
         }
     }
 
-
-    private Move alphaBeta(Board board, int depth, int alpha, int beta, Player player) {
+    private int alphaBeta(Board board, int depth, int alpha, int beta, Player player) {
         if (board.status().isGameOver() || depth <= 0) {
-            return new Move(board.evaluate(this), null);
+            return board.evaluate(this);
         }
 
-        if (this == player) {
-            List<Board.Pos> childPos = sortChildPos(board, player);
-            Move v = new Move(Integer.MIN_VALUE, null);
-            for (Board.Pos pos : childPos) {
-                Board bd = new Board(board);
-                bd.mark(pos, player);
-                Map<Long, Move> m = this.memory.get(depth);
-                Move w = m.get(bd.hash());
-                if (w == null) {
-                    w = alphaBeta(bd, depth - 1, alpha, beta, bd.getEnemy(player));
-                    m.put(bd.hash(), w);
+        Board.Pos bestPos = null;
+        int v = (this == player) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+        List<Board.Pos> childPos = sortChildPos(board);
+        for (Board.Pos pos : childPos) {
+            Board bd = new Board(board);
+            bd.mark(pos, player);
+            int w = alphaBeta(bd, depth - 1, alpha, beta, bd.getEnemy(player));
+            if (this == player) {
+                if (v < w) {
+                    v = w;
+                    bestPos = pos;
+                    if (depth == this.depth) {
+                        this.best = new Move(v, pos);
+                    }
                 }
-                if (v.compareTo(w) < 0) {
-                    v = new Move(w.getScore(), pos);
+                alpha = Integer.max(alpha, w);
+            } else {
+                if (v > w) {
+                    v = w;
+                    bestPos = pos;
                 }
-                alpha = Integer.max(alpha, v.getScore());
-                if (beta <= alpha) {
-                    break;
-                }
+                beta = Integer.min(beta, w);
             }
-            return v;
-        } else {
-            List<Board.Pos> childPos = sortChildPos(board, player);
-            Move v = new Move(Integer.MAX_VALUE, null);
-            for (Board.Pos pos : childPos) {
-                Board bd = new Board(board);
-                bd.mark(pos, player);
-                Map<Long, Move> m = this.memory.get(depth);
-                Move w = m.get(bd.hash());
-                if (w == null) {
-                    w = alphaBeta(bd, depth - 1, alpha, beta, bd.getEnemy(player));
-                    m.put(bd.hash(), w);
-                }
-                if (v.compareTo(w) > 0) {
-                    v = new Move(w.getScore(), pos);
-                }
-                beta = Integer.min(beta, v.getScore());
-                if (beta <= alpha) {
-                    break;
-                }
+
+            if (beta <= alpha) {
+                this.history[pos.getRow()][pos.getCol()] += 2 << depth;
+                break;
             }
-            return v;
         }
+        if (bestPos != null) {
+            this.history[bestPos.getRow()][bestPos.getCol()] += 2 << depth;
+        }
+        return v;
     }
 
-
-    private List<Board.Pos> sortChildPos(Board board, Player player) {
+    private List<Board.Pos> sortChildPos(Board board) {
         return board.getChildPos()
                     .stream()
-                    .map(pos -> {
-                        Board bd = new Board(board);
-                        bd.mark(pos, player);
-                        return new Move(bd.evaluate(this), pos);
-                    })
-                    .sorted((this == player) ? Comparator.comparing(Move::getScore).reversed() : Comparator.comparing(Move::getScore))
-                    .map(Move::getNext)
+                    .sorted(
+                        new Comparator<Board.Pos>() {
+                            @Override
+                            public int compare(Board.Pos o1, Board.Pos o2) {
+                                return Integer.compare(
+                                    ComputerPlayer.this.history[o2.getRow()][o2.getCol()],
+                                    ComputerPlayer.this.history[o1.getRow()][o1.getCol()]);
+                            }
+                        })
                     .collect(Collectors.toList());
     }
 }
