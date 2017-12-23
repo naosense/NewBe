@@ -50,7 +50,7 @@ public class ComputerPlayer extends Player {
 
     private int alphaBeta(Board board, int depth, int alpha, int beta, Player player) {
         if (board.status().isGameOver() || depth <= 0) {
-            return board.evaluate(this);
+            return board.evaluate(this, this.depth - depth);
         }
 
         Board.Pos bestPos = null;

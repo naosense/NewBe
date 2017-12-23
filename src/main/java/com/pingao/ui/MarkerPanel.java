@@ -69,7 +69,7 @@ public class MarkerPanel extends JPanel {
         if (this.isLast) {
             int x1 = 0, y1 = 0;
             int x2 = getSize().width - 1, y2 = getSize().height - 1;
-            g.setColor(Color.GREEN);
+            g.setColor(Color.RED);
             g.drawRect(x1, y1, x2, y2);
         }
     }

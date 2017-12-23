@@ -242,9 +242,9 @@ public class Board {
         return false;
     }
 
-    public int evaluate(Player player) {
+    public int evaluate(Player player, int ply) {
         if (this.status.isWinning()) {
-            return (player == this.status.winner) ? (Integer.MAX_VALUE - 1) : (Integer.MIN_VALUE + 1);
+            return (player == this.status.winner) ? (Integer.MAX_VALUE - 1 - ply) : (Integer.MIN_VALUE + 1 + ply);
         } else if (this.status.isDraw()) {
             return 0;
         } else {
